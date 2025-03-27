@@ -12,9 +12,8 @@ import LoginPage from "../pages/Login";
 import RegisterPage from "../pages/Register";
 import TodosPage from "../pages/Todos";
 
-const storageKey = "loggedInUser";
-const userDataString = localStorage.getItem(storageKey);
-const userData = userDataString ? JSON.parse(userDataString) : null;
+const isloggedIn=false;
+const userData:{email:string} |null=isloggedIn?{email:"email@gmail.com"}:null;
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,7 +24,7 @@ const router = createBrowserRouter(
           index
           element={
             <ProtectedRoute
-              isAllowed={userData?.jwt}
+              isAllowed={isloggedIn}
               redirectPath="/login"
               data={userData}
             >
@@ -37,7 +36,7 @@ const router = createBrowserRouter(
           path="/profile"
           element={
             <ProtectedRoute
-              isAllowed={userData?.jwt}
+              isAllowed={!isloggedIn}
               redirectPath="/login"
               data={userData}
             >
@@ -49,7 +48,7 @@ const router = createBrowserRouter(
           path="/todos"
           element={
             <ProtectedRoute
-              isAllowed={userData?.jwt}
+              isAllowed={isloggedIn}
               redirectPath="/login"
               data={userData}
             >
@@ -61,7 +60,7 @@ const router = createBrowserRouter(
           path="login"
           element={
             <ProtectedRoute
-              isAllowed={!userData?.jwt}
+              isAllowed={!isloggedIn}
               redirectPath="/"
               data={userData}
             >
@@ -73,7 +72,7 @@ const router = createBrowserRouter(
           path="register"
           element={
             <ProtectedRoute
-              isAllowed={!userData?.jwt}
+              isAllowed={!isloggedIn}
               redirectPath="/login"
               data={userData}
             >
