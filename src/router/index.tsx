@@ -12,7 +12,7 @@ import LoginPage from "../pages/Login";
 import RegisterPage from "../pages/Register";
 import TodosPage from "../pages/Todos";
 
-const isloggedIn=true;
+const isloggedIn=false;
 const userData:{email:string} |null=isloggedIn?{email:"email@gmail.com"}:null;
 
 const router = createBrowserRouter(
