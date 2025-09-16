@@ -77,7 +77,7 @@ const RegisterPage = () => {
 
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         {rendlerRejister}
-        <Button fullWidth> {isloading ? "loading" : "Register"} </Button>
+        <Button fullWidth isLoading ={isloading}> {isloading ? "loading" : "Register"} </Button>
       </form>
     </div>
   );
