@@ -3,6 +3,8 @@ import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { REGISTER_FORM } from "../data";
+import { RegisterSchema } from "../Valitation";
+import { yupResolver } from '@hookform/resolvers/yup';
 interface IFormInput {
   username: string;
   email: string;
@@ -15,7 +17,9 @@ const RegisterPage = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<IFormInput>();
+  } = useForm<IFormInput>(
+    {resolver: yupResolver(RegisterSchema)}
+  );
 
   // Handler
   const onSubmit: SubmitHandler<IFormInput> = (data) => {
@@ -25,25 +29,12 @@ const RegisterPage = () => {
   //rendler
   const rendlerRejister = REGISTER_FORM.map(
     ({ name, placeholder, validation }, intdex) => {
-
       return (
-      
-          <div key={intdex}>
-        <Input placeholder={placeholder} {...register(name, validation)} />
-        {errors.username && errors.username.type === "required" && (
-          <ErrorMassage msg="username is required" />
-        )}
-        {errors.username && errors.username.type === "minLength" && (
-          <ErrorMassage msg="username should be at-last 5 character" />
-        )}
-      </div>
-    
-        
-
-
-      )
-   
-      
+        <div key={intdex}>
+          <Input placeholder={placeholder} {...register(name, validation)} />
+          {errors[name] && <ErrorMassage msg={errors[name].message}/>}
+        </div>
+      );
     }
   );
 
@@ -56,6 +47,10 @@ const RegisterPage = () => {
       </h2>
 
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        
+
+     
+
         {rendlerRejister}
         <Button fullWidth>REister</Button>
       </form>

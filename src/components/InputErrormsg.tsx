@@ -1,7 +1,7 @@
 
 
 interface Iprops{
-    msg:string
+    msg?:string
 }
 
 const ErrorMassage = ({msg}:Iprops) => {
