@@ -8,6 +8,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import AxiosInstance from "../confing/axios.confing";
 import toast from "react-hot-toast";
 import { useState } from "react";
+import { AxiosError } from "axios";
+import { IErrorResponse } from "../interface";
 interface IFormInput {
   username: string;
   email: string;
@@ -48,8 +50,23 @@ const RegisterPage = () => {
         );
       }
     } catch (error) {
+      const errorObj= error as AxiosError<IErrorResponse>;
       //rejected
-      console.log(error);
+      console.log(errorObj.response?.data.error.message);
+       toast.error(
+          `${errorObj.response?.data.error.message}`,
+          {
+            position: "bottom-center",
+            duration: 1500,
+            style: {
+              backgroundColor: "black",
+              color: "white",
+              width: "fit-content",
+            },
+          }
+        );
+      
+    
     } finally {
       setIsLoading(false);
     }
