@@ -5,3 +5,10 @@ import * as yup from "yup";
   email:yup.string().required("email is required").matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/,"email not valid"),
   password: yup.string().required("password is required").min(6,"password  should be at-last 6 character")
 }).required();
+
+
+ export  const  LoginSchema = yup.object({
+  email:yup.string().required("email is required").matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/,"email not valid"),
+  password: yup.string().required("password is required").min(6,"password  should be at-last 6 character")
+}).required();
+

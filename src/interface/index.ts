@@ -10,7 +10,20 @@ export interface IRegisterInput{
 
         }
 
-        
+
+}
+
+export interface ILoginInput{
+
+
+      name:"email"|"password",
+        placeholder:string
+        validation:{
+         required: string
+         minLength?: number,
+             pattern?:RegExp
+
+        }
 
 
 }
