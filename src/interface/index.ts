@@ -16,7 +16,7 @@ export interface IRegisterInput{
 export interface ILoginInput{
 
 
-      name:"email"|"password",
+      name:"identifier"|"password",
         placeholder:string
         validation:{
          required: string

@@ -8,7 +8,7 @@ import * as yup from "yup";
 
 
  export  const  LoginSchema = yup.object({
-  email:yup.string().required("email is required").matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/,"email not valid"),
+  identifier:yup.string().required("email is required").matches(/^[^\s@]+@[^\s@]+\.[^\s@]+$/,"email not valid"),
   password: yup.string().required("password is required").min(6,"password  should be at-last 6 character")
 }).required();
 

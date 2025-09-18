@@ -1,16 +1,10 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, } from "react-router-dom";
 
 const Navbar = () => {
-  const { pathname } = useLocation();
-  const storageKey = "loggedInUser";
-  const userDataString = localStorage.getItem(storageKey);
-  const userData = userDataString ? JSON.parse(userDataString) : null;
-  const onLogout = () => {
-    localStorage.removeItem(storageKey);
-    setTimeout(() => {
-      location.replace(pathname);
-    }, 1500);
-  };
+  const storageKey="LoggedInUser";
+const userDataString=localStorage.getItem(storageKey);
+const userData=userDataString ? JSON.parse(userDataString) :null;
+
   return (
     <nav className="max-w-lg mx-auto mt-7 mb-20 px-3 py-5 rounded-md">
       <ul className="flex items-center justify-between">
@@ -27,7 +21,7 @@ const Navbar = () => {
             </li>
             <button
               className="bg-indigo-500 text-white p-2 rounded-md cursor-pointer"
-              onClick={onLogout}
+             
             >
               Logout
             </button>

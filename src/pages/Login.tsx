@@ -12,13 +12,13 @@ import { AxiosError } from "axios";
 import { IErrorResponse } from "../interface";
 
 interface IFormInput {
-  email: string;
+  identifier: string;
   password: string;
 }
 
 const LoginPage = () => {
   const [isloading, setIsLoading] = useState(false);
-
+ 
   const {
     register,
     handleSubmit,
@@ -33,7 +33,11 @@ const LoginPage = () => {
     setIsLoading(true);
     try {
       //fulfilled
-      const { status } = await AxiosInstance.post("/auth/local", data);
+      const { status, data: resData } = await AxiosInstance.post(
+        "/auth/local",
+        data
+      );
+      console.log(resData);
 
       if (status === 200) {
         toast.success(
@@ -49,6 +53,12 @@ const LoginPage = () => {
           }
         );
       }
+
+      localStorage.setItem("LoggedInUser", JSON.stringify(resData));
+
+      setTimeout(() => {
+        location.replace("/");
+      }, 2000);
     } catch (error) {
       const errorObj = error as AxiosError<IErrorResponse>;
       //rejected
