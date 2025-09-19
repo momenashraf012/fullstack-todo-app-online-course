@@ -4,6 +4,7 @@ import AxiosInstance from "../confing/axios.confing";
 
 const TodoList = () => {
   const [todoData, setTodoData] = useState([]);
+  const [lodding, setLodding] = useState(true);
   const storageKey = "LoggedInUser";
   const userDataString = localStorage.getItem(storageKey);
   const userData = userDataString ? JSON.parse(userDataString) : null;
@@ -19,20 +20,28 @@ const TodoList = () => {
         .catch((error) => console.log(error));
     } catch (error) {
       console.log(error);
+    } finally {
+      setLodding(false);
     }
   }, [userData.jwt]);
 
+  if (lodding) return <h1> Lodding..... </h1>;
+
   return (
     <div className="space-y-3">
-      {todoData.map((input) => (
-        <div key={input.id} className="flex  justify-between items-center">
-          <h1 className="text-lg">{input.title}</h1>
-          <div className="flex gap-2">
-            <Button> Edit </Button>
-            <Button className="bg-red-800 "> Cancel </Button>
+      {todoData.length ? (
+        todoData.map((todo) => (
+          <div key={todo.id} className="flex  justify-between items-center">
+            <h1 className="text-lg">{todo.title}</h1>
+            <div className="flex gap-2">
+              <Button> Edit </Button>
+              <Button className="bg-red-800 "> Cancel </Button>
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      ) : (
+        <h1> No todo yet... </h1>
+      )}
     </div>
   );
 };
