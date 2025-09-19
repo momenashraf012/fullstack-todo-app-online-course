@@ -23,15 +23,19 @@ const TodoList = () => {
 
   return (
     <div className="space-y-3">
-      {data.todos.map((todo) => (
-        <div key={todo.id} className="flex  justify-between items-center">
-          <h1 className="text-lg">{todo.title}</h1>
-          <div className="flex gap-2">
-            <Button> Edit </Button>
-            <Button className="bg-red-800 "> Cancel </Button>
+      {data.todos.length ? (
+        data.todos.map((todo) => (
+          <div key={todo.id} className="flex  justify-between items-center">
+            <h1 className="text-lg">{todo.title}</h1>
+            <div className="flex gap-2">
+              <Button> Edit </Button>
+              <Button className="bg-red-800 "> Cancel </Button>
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      ) : (
+        <h1> no Todo yet?.... </h1>
+      )}
     </div>
   );
 };
