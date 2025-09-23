@@ -3,9 +3,10 @@ import Button from "./ui/Button";
 import useAuthenticated from "../Hooks/useAuthenticated";
 import { Itodo } from "../interface";
 import Model from "./ui/Model";
-import { useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import Input from "./ui/Input";
 import Textarea from "./ui/Textarea";
+import AxiosInstance from "../confing/axios.confing";
 
 const TodoList = () => {
   const storageKey = "LoggedInUser";
@@ -38,6 +39,34 @@ const TodoList = () => {
   const onCloseEditModel = () => {
     setisEditModelOpen(false);
   };
+
+  const onChangeHandler = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    settodoToEdit({
+      ...todoToEdit,
+      [name]: value,
+    });
+  };
+const onSubmitHandler = async(e:FormEvent<HTMLFormElement>)=>{
+  e.preventDefault();
+  const {title,description}=todoToEdit
+  console.log(todoToEdit)
+  try {
+    await AxiosInstance.put(`/todos/${todoToEdit.id}`,{data:{
+      title,
+      description
+      
+    }},{headers:{
+      Authorization: `Bearer ${userData.jwt}`,
+    }} );
+
+    
+  } catch (error) {
+    console.log(error)
+  }
+
+
+}
   return (
     <div className="space-y-3">
       {data.todos.length ? (
@@ -45,7 +74,7 @@ const TodoList = () => {
           <div key={todo.id} className="flex  justify-between items-center">
             <h1 className="text-lg">{todo.title}</h1>
             <div className="flex gap-2">
-              <Button onClick={() => onOpenEditModel( todo)}> Edit </Button>
+              <Button onClick={() => onOpenEditModel(todo)}> Edit </Button>
               <Button className="bg-red-800 "> Cancel </Button>
             </div>
           </div>
@@ -59,17 +88,21 @@ const TodoList = () => {
         closeModal={onCloseEditModel}
         isOpen={isEditModelOpen}
       >
-        <div className="space-y-2">
-          <Input value={todoToEdit.title} />
-          <Textarea value={todoToEdit.description} />
+        <form className="space-y-2"  onSubmit={onSubmitHandler} >
+          <Input
+            value={todoToEdit.title}
+            onChange={onChangeHandler}
+            name="title"
+          />
+          <Textarea value={todoToEdit.description} onChange={onChangeHandler} name="description" />
           <div className="flex gap-4">
-            <Button> Update </Button>
+            <Button > Update </Button>
             <Button onClick={onCloseEditModel} variant={"cancel"}>
               {" "}
               Cancel{" "}
             </Button>
           </div>
-        </div>
+        </form>
       </Model>
     </div>
   );
