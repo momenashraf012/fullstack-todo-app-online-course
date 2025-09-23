@@ -13,6 +13,7 @@ const TodoList = () => {
   const userDataString = localStorage.getItem(storageKey);
   const userData = userDataString ? JSON.parse(userDataString) : null;
   const [isEditModelOpen, setisEditModelOpen] = useState(false);
+  const [isUpdate,setisUpdate]=useState(false);
   const [todoToEdit, settodoToEdit] = useState<Itodo>({
     id: 0,
     title: "",
@@ -20,7 +21,7 @@ const TodoList = () => {
   });
 
   const { isPending, data } = useAuthenticated({
-    queryKey: ["todos"],
+    queryKey: ["todos",`${todoToEdit.id}`],
     url: "/users/me?populate=todos",
     config: {
       headers: {
@@ -38,6 +39,7 @@ const TodoList = () => {
   };
   const onCloseEditModel = () => {
     setisEditModelOpen(false);
+    
   };
 
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -49,20 +51,29 @@ const TodoList = () => {
   };
 const onSubmitHandler = async(e:FormEvent<HTMLFormElement>)=>{
   e.preventDefault();
+ setisUpdate(true)
   const {title,description}=todoToEdit
   console.log(todoToEdit)
   try {
-    await AxiosInstance.put(`/todos/${todoToEdit.id}`,{data:{
+   const {status}= await AxiosInstance.put(`/todos/${todoToEdit.id}`,{data:{
       title,
       description
       
     }},{headers:{
       Authorization: `Bearer ${userData.jwt}`,
     }} );
+    if (status===404)
+    {
+      setisEditModelOpen(false);
+      
+    }
 
     
   } catch (error) {
     console.log(error)
+  }
+  finally {
+    setisUpdate(false);
   }
 
 
@@ -96,7 +107,7 @@ const onSubmitHandler = async(e:FormEvent<HTMLFormElement>)=>{
           />
           <Textarea value={todoToEdit.description} onChange={onChangeHandler} name="description" />
           <div className="flex gap-4">
-            <Button > Update </Button>
+            <Button isLoading={isUpdate} > Update </Button>
             <Button onClick={onCloseEditModel} variant={"cancel"}>
               {" "}
               Cancel{" "}
