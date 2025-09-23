@@ -38,3 +38,7 @@ export interface IErrorResponse {
     message?: string;
   };
 }
+
+export interface Itodo{
+  id:number,title:string
+}
