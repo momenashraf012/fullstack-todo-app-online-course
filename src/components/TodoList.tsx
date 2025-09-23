@@ -5,12 +5,18 @@ import { Itodo } from "../interface";
 import Model from "./ui/Model";
 import { useState } from "react";
 import Input from "./ui/Input";
+import Textarea from "./ui/Textarea";
 
 const TodoList = () => {
   const storageKey = "LoggedInUser";
   const userDataString = localStorage.getItem(storageKey);
   const userData = userDataString ? JSON.parse(userDataString) : null;
   const [isEditModelOpen, setisEditModelOpen] = useState(false);
+  const [todoToEdit, settodoToEdit] = useState<Itodo>({
+    id: 0,
+    title: "",
+    description: "",
+  });
 
   const { isPending, data } = useAuthenticated({
     queryKey: ["todos"],
@@ -25,7 +31,8 @@ const TodoList = () => {
   if (isPending) return "Loading...";
 
   //handler
-  const onOpenEditModel = () => {
+  const onOpenEditModel = (todo: Itodo) => {
+    settodoToEdit(todo);
     setisEditModelOpen(true);
   };
   const onCloseEditModel = () => {
@@ -38,7 +45,7 @@ const TodoList = () => {
           <div key={todo.id} className="flex  justify-between items-center">
             <h1 className="text-lg">{todo.title}</h1>
             <div className="flex gap-2">
-              <Button onClick={onOpenEditModel}> Edit </Button>
+              <Button onClick={() => onOpenEditModel( todo)}> Edit </Button>
               <Button className="bg-red-800 "> Cancel </Button>
             </div>
           </div>
@@ -53,15 +60,16 @@ const TodoList = () => {
         isOpen={isEditModelOpen}
       >
         <div className="space-y-2">
-       <Input  value={"hello momen"}/>
-        <div className="flex gap-4"> 
-      <Button onClick={onOpenEditModel}> Update </Button>
-          <Button onClick={onCloseEditModel} variant={"cancel"}> Cancel </Button>
-      
+          <Input value={todoToEdit.title} />
+          <Textarea value={todoToEdit.description} />
+          <div className="flex gap-4">
+            <Button> Update </Button>
+            <Button onClick={onCloseEditModel} variant={"cancel"}>
+              {" "}
+              Cancel{" "}
+            </Button>
+          </div>
         </div>
-          
-        </div>
-        
       </Model>
     </div>
   );
