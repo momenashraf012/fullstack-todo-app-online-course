@@ -12,17 +12,27 @@ const TodoList = () => {
   const storageKey = "LoggedInUser";
   const userDataString = localStorage.getItem(storageKey);
   const userData = userDataString ? JSON.parse(userDataString) : null;
+  const [isAddModelOpen, setisAddModelOpen] = useState(false);
+
   const [isEditModelOpen, setisEditModelOpen] = useState(false);
   const [isUpdate, setisUpdate] = useState(false);
   const [todoToEdit, settodoToEdit] = useState<Itodo>({
     id: 0,
     title: "",
     description: "",
+    documentId: "",
   });
+
+  const [todoToAdd, settodoToAdd] = useState({
+    title: "",
+    description: "",
+  });
+  const [queryversion, setqueryversion] = useState(1);
+
   const [isOpenConfirmModeal, setisOpenConfirmModea] = useState(false);
 
   const { isPending, data } = useAuthenticated({
-    queryKey: ["todos", `${todoToEdit.id}`],
+    queryKey: ["todos", `${queryversion}`],
     url: "/users/me?populate=todos",
     config: {
       headers: {
@@ -45,12 +55,20 @@ const TodoList = () => {
     );
 
   //handler
+  // Edit
   const onOpenEditModel = (todo: Itodo) => {
     settodoToEdit(todo);
     setisEditModelOpen(true);
   };
   const onCloseEditModel = () => {
     setisEditModelOpen(false);
+  };
+  // Add
+  const onOpenAModel = () => {
+    setisAddModelOpen(true);
+  };
+  const onCloseAddModel = () => {
+    setisAddModelOpen(false);
   };
 
   const OpenConfirmMadla = (todo: Itodo) => {
@@ -70,6 +88,17 @@ const TodoList = () => {
       [name]: value,
     });
   };
+
+  const onChangeHandlerADD = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    settodoToAdd({
+      ...todoToAdd,
+      [name]: value,
+    });
+  };
+
   const onSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setisUpdate(true);
@@ -77,7 +106,7 @@ const TodoList = () => {
     console.log(todoToEdit);
     try {
       const { status } = await AxiosInstance.put(
-        `/todos/${todoToEdit.id}`,
+        `/todos/${todoToEdit.documentId}`,
         {
           data: {
             title,
@@ -90,8 +119,48 @@ const TodoList = () => {
           },
         }
       );
-      if (status === 404) {
+      if (status === 200) {
         setisEditModelOpen(false);
+        setqueryversion((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setisUpdate(false);
+    }
+  };
+
+  // Add
+  const onSubmitHandlerAdd = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setisUpdate(true);
+    const { title, description } = todoToAdd;
+
+    try {
+      const { status } = await AxiosInstance.post(
+        `/todos`,
+        {
+          data: {
+            title,
+            description,
+
+            users: [userData.user.documentId],
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userData.jwt}`,
+          },
+        }
+      );
+      if (status === 200 || status === 201) {
+        setisAddModelOpen(false);
+        settodoToAdd({
+          title: "",
+          description: "",
+       
+        });
+        setqueryversion((prev) => prev + 1);
       }
     } catch (error) {
       console.log(error);
@@ -103,13 +172,17 @@ const TodoList = () => {
   //Remove
   const onRemove = async () => {
     try {
-      const { status } = await AxiosInstance.delete(`/todos/${todoToEdit.id}`, {
-        headers: {
-          Authorization: `Bearer ${userData.jwt}`,
-        },
-      });
-      if (status === 200) {
+      const { status } = await AxiosInstance.delete(
+        `/todos/${todoToEdit.documentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${userData.jwt}`,
+          },
+        }
+      );
+      if (status === 200 || status === 204) {
         CloseConfirmMadla();
+        setqueryversion((prev) => prev + 1);
       }
     } catch (error) {
       console.log(error);
@@ -118,10 +191,20 @@ const TodoList = () => {
 
   return (
     <div className="space-y-3">
+      <div className="flex justify-center">
+        <Button isLoading={isUpdate} onClick={onOpenAModel}>
+          {" "}
+          Post New Todo{" "}
+        </Button>
+      </div>
+
       {data.todos.length ? (
         data.todos.map((todo: Itodo) => (
           <div key={todo.id} className="flex  justify-between items-center">
-            <h1 className="text-lg">{todo.title}</h1>
+            <h1 className="text-lg">
+              {" "}
+              {todo.documentId} - {todo.title}
+            </h1>
             <div className="flex gap-2">
               <Button onClick={() => onOpenEditModel(todo)}> Edit </Button>
               <Button
@@ -140,6 +223,34 @@ const TodoList = () => {
         <h1> no Todo yet?.... </h1>
       )}
 
+      {/* Add  todo */}
+      <Model
+        title="Edit this todo"
+        closeModal={onCloseAddModel}
+        isOpen={isAddModelOpen}
+      >
+        <form className="space-y-2" onSubmit={onSubmitHandlerAdd}>
+          <Input
+            value={todoToAdd.title}
+            onChange={onChangeHandlerADD}
+            name="title"
+          />
+          <Textarea
+            value={todoToAdd.description}
+            onChange={onChangeHandlerADD}
+            name="description"
+          />
+          <div className="flex gap-4">
+            <Button isLoading={isUpdate}> ADD </Button>
+            <Button type="button" onClick={onCloseAddModel} variant={"cancel"}>
+              {" "}
+              Cancel{" "}
+            </Button>
+          </div>
+        </form>
+      </Model>
+
+      {/* Edit  */}
       <Model
         title="Edit this todo"
         closeModal={onCloseEditModel}
@@ -158,7 +269,7 @@ const TodoList = () => {
           />
           <div className="flex gap-4">
             <Button isLoading={isUpdate}> Update </Button>
-            <Button onClick={onCloseEditModel} variant={"cancel"}>
+            <Button type="button" onClick={onCloseEditModel} variant={"cancel"}>
               {" "}
               Cancel{" "}
             </Button>
@@ -176,7 +287,7 @@ const TodoList = () => {
           <Button variant={"danger"} isLoading={isUpdate} onClick={onRemove}>
             Yes ,remove
           </Button>
-          <Button onClick={CloseConfirmMadla} variant={"cancel"}>
+          <Button type="button" onClick={CloseConfirmMadla} variant={"cancel"}>
             Cancel
           </Button>
         </div>
