@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Paginator from "../components/ui/Pagination";
 import useAuthenticated from "../Hooks/useAuthenticated";
@@ -9,11 +8,11 @@ const TodosPage = () => {
   const storageKey = "LoggedInUser";
   const userDataString = localStorage.getItem(storageKey);
   const userData = userDataString ? JSON.parse(userDataString) : null;
-  const [page,setPage]=useState(1)
+  const [page, setPage] = useState(1);
 
-  const { isPending, data } = useAuthenticated({
-    queryKey: ["Paginate",`${page}`],
-    url: "/todos?=&pagination[pageSize]=50&pagination[page]=2",
+  const { isLoading, data } = useAuthenticated({
+    queryKey: ["Paginate", `${page}`],
+    url: `/todos?=&pagination[pageSize]=10&pagination[page]=${page}`,
     config: {
       headers: {
         Authorization: `Bearer ${userData.jwt}`,
@@ -21,20 +20,17 @@ const TodosPage = () => {
     },
   });
 
-  console.log(data)
+  console.log(data);
 
-  const onClickPrev=()=>
-  {
-    setPage(prev => prev -1 )
+  const onClickPrev = () => {
+    setPage((prev) => prev - 1);
+  };
 
-  }
+  const onClickNext = () => {
+    setPage((prev) => prev + 1);
+  };
 
-  const onClickNext =()=>{
-setPage(prev => prev +1 )
-
-  }
-
-  if (isPending)
+  if (isLoading)
     return (
       <div role="status" className="max-w-sm animate-pulse">
         <div className="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
@@ -48,10 +44,13 @@ setPage(prev => prev +1 )
     );
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 ">
       {data.data.length ? (
         data.data.map((todo: Itodo) => (
-          <div key={todo.id} className="flex items-center justify-between hover:bg-gray-100 duration-300 p-3 rounded-md even:bg-gray-100">
+          <div
+            key={todo.id}
+            className="flex items-center justify-between hover:bg-gray-100 duration-300 p-3 rounded-md even:bg-gray-100"
+          >
             <h1 className="text-lg">
               {" "}
               {todo.id} - {todo.title}
@@ -62,9 +61,14 @@ setPage(prev => prev +1 )
         <h1> no Todo yet?.... </h1>
       )}
 
-
-
-      <Paginator page={page} pageCount={3} onClickPrev={onClickPrev} onClickNext={onClickNext}/>
+      <Paginator
+        page={page}
+        pageCount={data.meta.pagination.pageCount}
+        onClickPrev={onClickPrev}
+        onClickNext={onClickNext}
+        total={data.meta.pagination.total}
+       
+      />
     </div>
   );
 };
