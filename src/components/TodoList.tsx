@@ -240,7 +240,7 @@ const TodoList = () => {
             </h1>
             <div className="flex gap-2">
               <Button onClick={() => onOpenEditModel(todo)}> Edit </Button>
-              <Button
+              <Button variant={"danger"}
                 onClick={() => {
                   OpenConfirmMadla(todo);
                 }}
