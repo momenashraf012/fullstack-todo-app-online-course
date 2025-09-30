@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import Paginator from "../components/ui/Pagination";
 import useAuthenticated from "../Hooks/useAuthenticated";
 import { Itodo } from "../interface";
@@ -8,9 +9,10 @@ const TodosPage = () => {
   const storageKey = "LoggedInUser";
   const userDataString = localStorage.getItem(storageKey);
   const userData = userDataString ? JSON.parse(userDataString) : null;
+  const [page,setPage]=useState(1)
 
   const { isPending, data } = useAuthenticated({
-    queryKey: ["Paginate"],
+    queryKey: ["Paginate",`${page}`],
     url: "/todos?=&pagination[pageSize]=50&pagination[page]=2",
     config: {
       headers: {
@@ -20,6 +22,17 @@ const TodosPage = () => {
   });
 
   console.log(data)
+
+  const onClickPrev=()=>
+  {
+    setPage(prev => prev -1 )
+
+  }
+
+  const onClickNext =()=>{
+setPage(prev => prev +1 )
+
+  }
 
   if (isPending)
     return (
@@ -51,7 +64,7 @@ const TodosPage = () => {
 
 
 
-      <Paginator />
+      <Paginator page={page} pageCount={3} onClickPrev={onClickPrev} onClickNext={onClickNext}/>
     </div>
   );
 };
