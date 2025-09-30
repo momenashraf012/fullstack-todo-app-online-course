@@ -11,6 +11,11 @@ const Paginator = ({page=1,pageCount,onClickPrev,onClickNext,total}:IProps) => {
   return (
     <div className="flex justify-center items-center">
 
+        
+
+
+
+
      <p className="text-sm text-gray-600 mx-3">
         Page{" "}
         <span className="mx-1 font-semibold text-gray-900 text-md-1">
