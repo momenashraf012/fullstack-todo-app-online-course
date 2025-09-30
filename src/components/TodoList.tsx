@@ -7,6 +7,7 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import Input from "./ui/Input";
 import Textarea from "./ui/Textarea";
 import AxiosInstance from "../confing/axios.confing";
+import { faker } from "@faker-js/faker";
 
 const TodoList = () => {
   const storageKey = "LoggedInUser";
@@ -158,7 +159,6 @@ const TodoList = () => {
         settodoToAdd({
           title: "",
           description: "",
-       
         });
         setqueryversion((prev) => prev + 1);
       }
@@ -166,6 +166,36 @@ const TodoList = () => {
       console.log(error);
     } finally {
       setisUpdate(false);
+    }
+  };
+
+  const onGenerate = async () => {
+    for (let index = 0; index < 100; index++) {
+      try {
+        const { status } = await AxiosInstance.post(
+          `/todos`,
+          {
+            data: {
+              title: faker.word.words(2),
+              description: faker.lorem.paragraph(2),
+
+              users: [userData.user.documentId],
+            },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${userData.jwt}`,
+            },
+          }
+        );
+        if (status === 200 || status === 201) {
+          setqueryversion((prev) => prev + 1);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setisUpdate(false);
+      }
     }
   };
 
@@ -191,10 +221,13 @@ const TodoList = () => {
 
   return (
     <div className="space-y-3">
-      <div className="flex justify-center">
+      <div className="flex justify-center gap-3">
         <Button isLoading={isUpdate} onClick={onOpenAModel}>
           {" "}
           Post New Todo{" "}
+        </Button>
+        <Button variant={"cancel"} isLoading={isUpdate} onClick={onGenerate}>
+          Generate Todo
         </Button>
       </div>
 
@@ -203,7 +236,7 @@ const TodoList = () => {
           <div key={todo.id} className="flex  justify-between items-center">
             <h1 className="text-lg">
               {" "}
-              {todo.documentId} - {todo.title}
+              {todo.id} - {todo.title}
             </h1>
             <div className="flex gap-2">
               <Button onClick={() => onOpenEditModel(todo)}> Edit </Button>
